@@ -2,7 +2,9 @@ node {
 
     stages {
         stage('Build gradle') {
-            sh './gradlew build'
+            steps {
+                sh './gradlew build'
+            }
         }
 
         stage('Build docker image') {
