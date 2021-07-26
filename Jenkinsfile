@@ -1,5 +1,14 @@
 node {
-      stage('Build gradle') {
+
+    stages {
+        stage('Build gradle') {
         sh './gradlew build'
+        }
+
+        stage('Build docker image') {
+            steps {
+                sh 'docker build -t $registry:latest .'
+            }
+        }
       }
 }
