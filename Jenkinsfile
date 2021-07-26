@@ -1,5 +1,4 @@
 node {
-    agent none
     stages {
         stage('Build gradle') {
             steps {
