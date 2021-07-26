@@ -1,27 +1,64 @@
-node {
-    // Get Artifactory server instance, defined in the Artifactory Plugin administration page.
-    def server = Artifactory.server "SERVER_ID"
-    // Create an Artifactory Gradle instance.
-    def rtGradle = Artifactory.newGradleBuild()
-    def buildInfo
+pipeline {
+    agent any
 
-    stage('Clone sources') {
-        git url: 'https://github.com/JISEON-YANG/AWSPJ-soldesk.git'
+    triggers {
+        pollSCM('*/5 * * * *')
     }
 
-    stage('Artifactory configuration') {
-        // Tool name from Jenkins configuration
-        rtGradle.tool = "Gradle-2.4"
-        // Set Artifactory repositories for dependencies resolution and artifacts deployment.
-        rtGradle.deployer repo:'ext-release-local', server: server
-        rtGradle.resolver repo:'remote-repos', server: server
-    }
+    stages {
+        stage('Compile') {
+            steps {
+                gradlew('clean', 'classes')
+            }
+        }
 
-    stage('Gradle build') {
-        buildInfo = rtGradle.run rootDir: "gradle-examples/4/gradle-example-ci-server/", buildFile: 'build.gradle', tasks: 'clean artifactoryPublish'
+        stage('Long-running Verification') {
+            environment {
+                SONAR_LOGIN = credentials('SONARCLOUD_TOKEN')
+            }
+            parallel {
+                stage('Integration Tests') {
+                    steps {
+                        gradlew('integrationTest')
+                    }
+                }
+                stage('Code Analysis') {
+                    steps {
+                        gradlew('sonarqube')
+                    }
+                }
+            }
+        }
+        stage('Assemble') {
+            steps {
+                gradlew('assemble')
+                stash includes: '**/build/libs/*.war', name: 'app'
+            }
+        }
+        stage('Promotion') {
+            steps {
+                timeout(time: 1, unit:'DAYS') {
+                    input 'Deploy to Production?'
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            environment {
+                HEROKU_API_KEY = credentials('HEROKU_API_KEY')
+            }
+            steps {
+                unstash 'app'
+                gradlew('deployHeroku')
+            }
+        }
     }
+    post {
+        failure {
+            mail to: 'benjamin.muschko@gmail.com', subject: 'Build failed', body: 'Please fix!'
+        }
+    }
+}
 
-    stage('Publish build info') {
-        server.publishBuildInfo buildInfo
-    }
+def gradlew(String... args) {
+    sh "./gradlew ${args.join(' ')} -s"
 }
