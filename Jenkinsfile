@@ -1,7 +1,5 @@
 node {
-      withGradle {
+      stage('Build gradle') {
         sh './gradlew build'
       }
-
-
 }
