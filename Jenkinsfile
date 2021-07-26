@@ -1,4 +1,4 @@
-node {
+pipeline {
     stages {
         stage('Build gradle') {
             steps {
@@ -11,5 +11,5 @@ node {
                 sh 'docker build -t $registry:latest .'
             }
         }
-      }
+    }
 }
