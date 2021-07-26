@@ -10,7 +10,7 @@ EXPOSE 8080
 
 # https://docs.docker.com/engine/reference/builder/#add
 # 애플리케이션 파일 추가
-ADD ./TestDbWeb-1.0-SNAPSHOT.jar application.jar
+ADD ./build/libs/TestDbWeb-1.0-SNAPSHOT.jar application.jar
 
 # https://docs.docker.com/engine/reference/builder/#entrypoint
 # 실행
