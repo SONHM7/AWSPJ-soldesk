@@ -21,7 +21,7 @@ pipeline {
 
         stage('tag'){
             steps{
-                sh 'docker tag mbox:latest public.ecr.aws/d0u4r1r6/jenkins:latest'
+                sh 'docker tag jenkins:latest 256746287291.dkr.ecr.ap-northeast-2.amazonaws.com/jenkins:latest'
             }
         }
 
