@@ -6,7 +6,9 @@ node {
         }
 
         stage('Build docker image') {
-            sh 'docker build -t $registry:latest .'
+            steps {
+                sh 'docker build -t $registry:latest .'
+            }
         }
       }
 }
