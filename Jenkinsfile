@@ -27,7 +27,7 @@ pipeline {
 
         stage('push'){
             steps{
-                sh 'docker push public.ecr.aws/d0u4r1r6/jenkins:latest'
+                sh 'docker push 256746287291.dkr.ecr.ap-northeast-2.amazonaws.com/jenkins:latest'
             }
         }
     }
