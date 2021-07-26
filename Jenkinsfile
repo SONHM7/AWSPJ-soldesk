@@ -1,5 +1,5 @@
 pipeline {
-
+    stages {
         stage ('Test & Build Artifact') {
             agent {
                 docker {
@@ -19,5 +19,5 @@ pipeline {
                 }
             }
         }
-
+    }
 }
