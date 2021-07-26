@@ -1,47 +1,29 @@
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('*/5 * * * *')
+    triggers{
+        bitbucketPush()
     }
 
     stages {
-        stage('Compile') {
+        stage ('Test & Build Artifact') {
+            agent {
+                docker {
+                    image 'openjdk:11'
+                    args '-v "$PWD":/app'
+                    reuseNode true
+                }
+            }
             steps {
-                gradlew('clean', 'classes')
+                sh './gradlew clean build'
             }
         }
-
-        stage('Assemble') {
+        stage ('Build & Push docker image') {
             steps {
-                gradlew('assemble')
-                stash includes: '**/build/libs/*.war', name: 'app'
-            }
-        }
-        stage('Promotion') {
-            steps {
-                timeout(time: 1, unit:'DAYS') {
-                    input 'Deploy to Production?'
+                withDockerRegistry(url: 'https://index.docker.io/v1/') {
+                    sh 'docker push turkogluc/spring-jenkins-demo'
                 }
             }
         }
-        stage('Deploy to Production') {
-/*             environment {
-                HEROKU_API_KEY = credentials('HEROKU_API_KEY')
-            } */
-            steps {
-                unstash 'app'
-                gradlew('deployHeroku')
-            }
-        }
     }
-    post {
-        failure {
-            mail to: 'didwltjs324@gmail.com', subject: 'Build failed', body: 'Please fix!'
-        }
-    }
-}
-
-def gradlew(String... args) {
-    sh "./gradlew ${args.join(' ')} -s"
 }
