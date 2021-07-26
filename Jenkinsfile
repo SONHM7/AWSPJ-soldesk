@@ -15,7 +15,7 @@ pipeline {
 
         stage('login'){
             steps{
-            sh 'aws ecr-public get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin public.ecr.aws/d0u4r1r6'
+                sh 'aws ecr-public get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin public.ecr.aws/d0u4r1r6/jenkins'
             }
         }
 
