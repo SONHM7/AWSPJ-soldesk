@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mybox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mybox
+  template:
+    metadata:
+      labels:
+        run: mybox
+    spec:
+      containers:
+        - image: 783845918471.dkr.ecr.ap-northeast-2.amazonaws.com/jenkins:latest
+          name: mybox
+          ports:
+            - containerPort: 8080
