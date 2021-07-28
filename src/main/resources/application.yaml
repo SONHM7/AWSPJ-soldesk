@@ -16,3 +16,5 @@ spring:
     store-type: jdbc
 logging.level:
   org.hibernate.SQL: debug
+
+  #gggg
